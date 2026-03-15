@@ -55,7 +55,8 @@ const COPY = {
     detected: (kind: string) => `Detected ${kind}.`,
     noDoi: "No DOI detected. Paste one manually.",
     noActiveTab: "No active tab available.",
-    downloadFailed: "Download failed. Please try again."
+    downloadFailed: "Download failed. Please try again.",
+    campusHint: "Note: Campus network IP required for non-open access full-text."
   },
   zh: {
     title: "Mdtero",
@@ -88,7 +89,8 @@ const COPY = {
     detected: (kind: string) => `已识别${kind}。`,
     noDoi: "未识别到 DOI，请手动粘贴。",
     noActiveTab: "当前没有可用标签页。",
-    downloadFailed: "下载失败，请重试。"
+    downloadFailed: "下载失败，请重试。",
+    campusHint: "提示：需要校园网或机构 IP 才能获取非开源全文，否则仅解析摘要。"
   }
 } satisfies Record<UiLanguage, Record<string, string | ((...args: any[]) => string)>>;
 
@@ -101,6 +103,7 @@ const freeHintEl = document.querySelector<HTMLParagraphElement>("#free-hint");
 const inputLabelEl = document.querySelector<HTMLLabelElement>("#paper-input-label");
 const inputEl = document.querySelector<HTMLInputElement>("#paper-input");
 const statusEl = document.querySelector<HTMLParagraphElement>("#status");
+const campusHintEl = document.querySelector<HTMLParagraphElement>("#campus-hint");
 const parseButton = document.querySelector<HTMLButtonElement>("#parse-button");
 const openSettingsButton = document.querySelector<HTMLButtonElement>("#open-settings");
 const translateLanguageLabelEl = document.querySelector<HTMLLabelElement>("#translate-language-label");
@@ -197,6 +200,7 @@ function applyLanguage() {
   if (freeHintEl) freeHintEl.textContent = copy.freeHint;
   if (inputLabelEl) inputLabelEl.textContent = copy.inputLabel;
   if (inputEl) inputEl.placeholder = copy.inputPlaceholder;
+  if (campusHintEl) campusHintEl.textContent = copy.campusHint;
   if (translateLanguageLabelEl) translateLanguageLabelEl.textContent = copy.translateLabel;
   if (sourceFilesSummaryEl) sourceFilesSummaryEl.textContent = copy.sourceFiles;
   if (recentTasksSummaryEl) recentTasksSummaryEl.textContent = copy.recentTasks;
@@ -517,6 +521,11 @@ parseButton?.addEventListener("click", async () => {
   setResult(getActionStatusText("queued_parse", uiLanguage));
 
   const settings = await readSettings();
+  if (!input.includes("arxiv.org") && !settings.elsevierApiKey) {
+    void chrome.runtime.openOptionsPage();
+    return;
+  }
+  
   const response = await chrome.runtime.sendMessage(createParseMessage(input, settings.elsevierApiKey));
   if (!response?.ok) {
     isParsing = false;
@@ -583,6 +592,17 @@ languageToggleEl?.addEventListener("click", async () => {
 
 void (async () => {
   await initializeLanguage();
+  
+  const settings = await readSettings();
+  if (!settings.token) {
+    void chrome.runtime.openOptionsPage();
+  } else if (!settings.elsevierApiKey) {
+    // If logged in but no Elsevier API key, maybe open options too.
+    // However, arxiv users might not have/need one. Let's redirect if they are not in the act of pasting an arxiv link.
+    // For now we just open it on boot if they have no API key.
+    void chrome.runtime.openOptionsPage();
+  }
+
   await refreshUsage();
   await renderRecentTasks();
   renderActionButtons();

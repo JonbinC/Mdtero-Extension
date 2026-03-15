@@ -1,13 +1,20 @@
 const DOI_PATTERN = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/i;
+const ARXIV_PATTERN = /arxiv\.org\/(abs|pdf|html)\/([a-z\-]+\/\d{7}|[0-9]{4}\.[0-9]{4,5})/i;
 
 export type DetectedPaperInput =
   | { kind: "doi"; value: string }
-  | { kind: "sciencedirect"; value: string };
+  | { kind: "sciencedirect"; value: string }
+  | { kind: "arxiv"; value: string };
 
 export function detectPaperInput(input: {
   url: string;
   html: string;
 }): DetectedPaperInput | null {
+  const arxivMatch = input.url.match(ARXIV_PATTERN);
+  if (arxivMatch) {
+    return { kind: "arxiv", value: input.url };
+  }
+
   const urlMatch = input.url.match(DOI_PATTERN);
   if (urlMatch) {
     return { kind: "doi", value: urlMatch[0] };

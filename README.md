@@ -88,6 +88,20 @@ Mdtero is engineered for researchers who code. After generating your API key at 
 
 ---
 
+### 📝 Why Markdown? (为什么选择 Markdown？)
+
+Markdown is a lightweight plaintext formatting syntax designed to be completely platform-independent. We chose Markdown as the universal output format for Mdtero because it is the ultimate bridge between human readability and machine parsability (**机读人读都顺心**).
+
+- **Structurally Intact Translations (保留完整结构)**: Our contextual AI translation engine preserves the exact Markdown formatting of the original English text—ensuring headers, lists, and LaTeX equations remain perfectly styled in the translated Chinese output.
+- **Context-Aware Navigation (解析保留上下文跳转)**: Mdtero meticulously extracts internal document anchors. Clicking on a reference like `[Fig. 1]` or `[31]` in your generated Markdown will instantly jump to the corresponding image or citation, retaining the full context of the paper.
+- **Future-Proof**: Markdown files are simple `.md` text files. They will never become corrupted, require expensive proprietary software to open, or suffer from formatting glitches like PDFs or Word Documents.
+
+**💡 Recommended Editor (推荐编辑器):**
+If you are new to Markdown, we highly recommend **[Typora](https://typora.io/)**. Typora is a seamless, distraction-free Markdown editor that provides real-time previewing—meaning you see formatted text, rendered math equations, and tables instantly as you type or read the papers parsed by Mdtero.
+
+---
+
+### 📦 Quick Start (Chrome Extension)
 ### 📦 插件安装说明 (面向普通用户)
 
 1. 从我们的 [主页 Demo](https://mdtero.com/demo) 下载最新的 `mdtero-extension-beta.zip`，或直接使用本仓库源码编译。
